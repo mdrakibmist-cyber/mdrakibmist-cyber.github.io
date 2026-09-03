@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Md. Rakibul Hasan — Electrical &amp; Electronic Engineer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230E1512'/%3E%3Cpath d='M17 4 7 18h7l-2 10 11-16h-7z' fill='%23C4834B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -35,6 +36,11 @@
     html{scroll-behavior:auto;}
     *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
   }
+  .reveal{
+    opacity:0; transform:translateY(16px);
+    transition:opacity 0.8s cubic-bezier(.19,1,.22,1), transform 0.8s cubic-bezier(.19,1,.22,1);
+  }
+  .reveal.is-visible{opacity:1; transform:none;}
   h1,h2,h3{
     font-family:'Fraunces',serif;
     font-weight:500;
@@ -44,6 +50,47 @@
   a{color:var(--teal);}
   a:focus-visible, button:focus-visible{outline:2px solid var(--teal); outline-offset:3px;}
   .wrap{max-width:var(--max); margin:0 auto; padding:0 28px;}
+
+  /* ---------- SCROLL VOLTAGE METER ---------- */
+  .volt-meter{
+    position:fixed; top:0; left:0; width:100%; height:2px; z-index:30;
+    background:transparent;
+  }
+  .volt-meter span{
+    display:block; height:100%; width:0%;
+    background:linear-gradient(90deg, var(--copper), var(--teal));
+  }
+
+  /* ---------- BUSBAR RAIL NAV ---------- */
+  .busbar{
+    position:fixed; left:26px; top:50%; transform:translateY(-50%);
+    z-index:25; display:flex; flex-direction:column; align-items:center;
+  }
+  .busbar::before{
+    content:""; position:absolute; left:50%; top:0; bottom:0; width:1px;
+    background:var(--line); transform:translateX(-50%);
+  }
+  .busbar-node{
+    position:relative; width:9px; height:9px; border-radius:50%;
+    background:var(--bg); border:1.5px solid var(--line);
+    margin:13px 0; cursor:pointer; padding:0; display:block;
+    font:inherit; appearance:none; -webkit-appearance:none;
+    transition:background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .busbar-node:hover{border-color:var(--teal);}
+  .busbar-node.active{
+    background:var(--copper); border-color:var(--copper);
+    box-shadow:0 0 0 5px rgba(196,131,75,0.16);
+  }
+  .busbar-node .bb-label{
+    position:absolute; left:20px; top:50%; transform:translateY(-50%);
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--paper);
+    background:var(--bg-soft); border:1px solid var(--line); padding:4px 9px;
+    border-radius:2px; white-space:nowrap;
+    opacity:0; pointer-events:none; transition:opacity 0.2s ease;
+  }
+  .busbar-node:hover .bb-label{opacity:0.95;}
+  @media (max-width:980px){ .busbar{display:none;} }
 
   /* ---------- NAV ---------- */
   nav{
@@ -72,6 +119,11 @@
     overflow:hidden;
     padding:88px 0 72px;
     border-bottom:1px solid var(--line-soft);
+    background-image:
+      linear-gradient(rgba(242,239,230,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(242,239,230,0.035) 1px, transparent 1px);
+    background-size:34px 34px;
+    background-position:center top;
   }
   .hero-grid{
     display:grid;
@@ -110,6 +162,34 @@
   .btn-ghost{color:var(--paper); }
   .btn-ghost:hover{border-color:var(--teal); color:var(--teal);}
 
+  .nameplate{
+    display:inline-block;
+    background:linear-gradient(155deg, #232D27, #171F1A);
+    border:1px solid rgba(242,239,230,0.22);
+    border-radius:3px;
+    padding:16px 20px 14px;
+    margin-bottom:30px;
+    position:relative;
+    box-shadow:0 18px 34px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .nameplate::before,.nameplate::after{
+    content:""; position:absolute; top:9px; width:5px; height:5px; border-radius:50%;
+    background:#454f48; box-shadow:inset 0 1px 1px rgba(0,0,0,0.6);
+  }
+  .nameplate::before{left:9px;}
+  .nameplate::after{right:9px;}
+  .nameplate-top{
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:0.06em;
+    color:var(--teal); opacity:0.85; padding-bottom:8px; margin-bottom:10px;
+    border-bottom:1px solid rgba(242,239,230,0.14);
+  }
+  .nameplate-rows{
+    display:grid; grid-template-columns:auto auto; gap:3px 20px;
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem;
+  }
+  .nameplate-rows .k{opacity:0.5;}
+  .nameplate-rows .v{opacity:0.88;}
   .schematic{width:100%; height:auto; opacity:0.95;}
   .schematic .draw{
     stroke-dasharray:600;
@@ -151,7 +231,9 @@
     content:""; position:absolute; left:-5px; top:5px;
     width:9px; height:9px; border-radius:50%;
     background:var(--bg); border:2px solid var(--copper);
+    transition:background 0.3s ease;
   }
+  .t-item:hover::before{background:var(--copper);}
   .t-item h3{font-size:1.08rem;}
   .t-meta{
     font-family:'IBM Plex Mono',monospace; font-size:0.78rem;
@@ -186,7 +268,9 @@
     border-radius:4px;
     padding:26px;
     background:var(--bg-soft);
+    transition:border-color 0.35s ease, transform 0.35s ease;
   }
+  .proj-card:hover{border-color:var(--teal); transform:translateY(-3px);}
   .proj-card h3{font-size:1.05rem; line-height:1.3;}
   .proj-card .tag{
     font-family:'IBM Plex Mono',monospace; font-size:0.72rem;
@@ -200,8 +284,31 @@
   .skill-group h3{font-size:1rem; color:var(--teal); font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:0.85rem;}
   .skill-group ul{list-style:none; margin:16px 0 0; padding:0;}
   .skill-group li{
-    padding:9px 0; border-top:1px solid var(--line-soft); opacity:0.88; font-size:0.94rem;
+    padding:12px 0; border-top:1px solid var(--line-soft); font-size:0.94rem;
   }
+  .skill-row{display:flex; align-items:center; justify-content:space-between; opacity:0.92;}
+  .skill-bar{
+    margin-top:8px; height:4px; border-radius:2px; background:var(--line-soft); overflow:hidden;
+  }
+  .skill-bar span{
+    display:block; height:100%; border-radius:2px;
+    width:0%;
+    background:linear-gradient(90deg, var(--copper), var(--teal));
+    transition:width 1.1s cubic-bezier(.19,1,.22,1);
+  }
+
+  /* ---------- ENERGY MIX VIZ ---------- */
+  .mix{margin-top:26px;}
+  .mix-row{display:flex; align-items:center; gap:12px; margin-top:10px;}
+  .mix-label{
+    width:74px; flex:none; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; opacity:0.65;
+  }
+  .mix-track{flex:1; height:10px; background:rgba(16,22,15,0.08); border-radius:2px; overflow:hidden;}
+  .mix-track span{
+    display:block; height:100%; border-radius:2px; width:0%;
+    transition:width 1.2s cubic-bezier(.19,1,.22,1);
+  }
+  .mix-val{width:52px; flex:none; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:0.76rem; opacity:0.65;}
 
   /* ---------- CONTACT ---------- */
   footer.contact{padding:80px 0 60px;}
@@ -216,6 +323,19 @@
 </style>
 </head>
 <body>
+
+<div class="volt-meter"><span id="voltFill"></span></div>
+
+<nav class="busbar" aria-label="Section navigation">
+  <button class="busbar-node" data-target="top" aria-label="Intro"><span class="bb-label">INTRO</span></button>
+  <button class="busbar-node" data-target="about" aria-label="About"><span class="bb-label">ABOUT</span></button>
+  <button class="busbar-node" data-target="training" aria-label="Training"><span class="bb-label">TRAINING</span></button>
+  <button class="busbar-node" data-target="thesis" aria-label="Thesis"><span class="bb-label">THESIS</span></button>
+  <button class="busbar-node" data-target="projects" aria-label="Projects"><span class="bb-label">PROJECTS</span></button>
+  <button class="busbar-node" data-target="leadership" aria-label="Leadership"><span class="bb-label">LEADERSHIP</span></button>
+  <button class="busbar-node" data-target="skills" aria-label="Skills"><span class="bb-label">SKILLS</span></button>
+  <button class="busbar-node" data-target="contact" aria-label="Contact"><span class="bb-label">CONTACT</span></button>
+</nav>
 
 <nav>
   <div class="wrap">
@@ -234,6 +354,15 @@
 <header class="hero" id="top">
   <div class="wrap hero-grid">
     <div>
+      <div class="nameplate">
+        <div class="nameplate-top"><span>RATING PLATE</span><span>UNIT 01</span></div>
+        <div class="nameplate-rows">
+          <span class="k">TYPE</span><span class="v">EEE GRADUATE ENGINEER</span>
+          <span class="k">ORIGIN</span><span class="v">MIST · DHAKA · 2026</span>
+          <span class="k">CGPA</span><span class="v">3.16 / 4.00</span>
+          <span class="k">STATUS</span><span class="v">OPEN TO ROLES</span>
+        </div>
+      </div>
       <h1>Md. Rakibul Hasan</h1>
       <div class="role">Electrical &amp; Electronic Engineer — MIST, Dhaka</div>
       <p class="lede">I design and simulate power systems — from off-grid renewable microgrids to the training floor of a national utility — and lead the teams that get projects across the finish line.</p>
@@ -326,17 +455,17 @@
 
 <section id="training">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <h2>Industrial training</h2>
       <span class="section-num">02</span>
     </div>
     <div class="timeline">
-      <div class="t-item">
+      <div class="t-item reveal">
         <h3>Rural Power Company Ltd. (RPCL)</h3>
         <span class="t-meta">Trainee · 9 – 24 May 2025</span>
         <p>Trained at a power generation plant, observing generators, turbines, control systems, and switchyard operation, including grid synchronization — plus the maintenance and safety protocols that keep a plant running.</p>
       </div>
-      <div class="t-item">
+      <div class="t-item reveal">
         <h3>Dhaka Electric Supply Company Ltd. (DESCO)</h3>
         <span class="t-meta">Trainee · 26 May – 9 June 2025</span>
         <p>Hands-on training on distribution systems, substation equipment, and protective devices, with direct exposure to fault handling and routine maintenance in a live utility environment.</p>
@@ -347,11 +476,11 @@
 
 <section id="thesis">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <h2>Featured: final-year thesis</h2>
       <span class="section-num">03</span>
     </div>
-    <div class="thesis-card">
+    <div class="thesis-card reveal">
       <div>
         <span class="thesis-tag">SUPERVISOR — HASAN MONIR, ASST. PROFESSOR, EECE</span>
         <h3>An off-grid hybrid renewable system for remote riverside communities in Bangladesh</h3>
@@ -360,6 +489,23 @@
           <div class="metric"><b>40 kWac</b><span>PV array</span></div>
           <div class="metric"><b>700 kWh</b><span>LFP battery bank</span></div>
           <div class="metric"><b>53</b><span>households served</span></div>
+        </div>
+        <div class="mix">
+          <div class="mix-row">
+            <span class="mix-label">SOLAR PV</span>
+            <div class="mix-track"><span style="background:var(--copper);" data-w="74%"></span></div>
+            <span class="mix-val">40 kW</span>
+          </div>
+          <div class="mix-row">
+            <span class="mix-label">WIND</span>
+            <div class="mix-track"><span style="background:#6b5230;" data-w="38%"></span></div>
+            <span class="mix-val">10 kW</span>
+          </div>
+          <div class="mix-row">
+            <span class="mix-label">BATTERY</span>
+            <div class="mix-track"><span style="background:var(--teal);" data-w="100%"></span></div>
+            <span class="mix-val">700 kWh</span>
+          </div>
         </div>
       </div>
       <div class="diagram-box">
@@ -406,22 +552,22 @@
 
 <section id="projects">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <h2>Other academic projects</h2>
       <span class="section-num">04</span>
     </div>
     <div class="proj-grid">
-      <div class="proj-card">
+      <div class="proj-card reveal">
         <span class="tag">DSP · MATLAB</span>
         <h3>MATLAB-based audio equalizer</h3>
         <p>A 3-band audio equalizer built from digital filters, with FFT-based frequency analysis to shape and verify the response.</p>
       </div>
-      <div class="proj-card">
+      <div class="proj-card reveal">
         <span class="tag">Power electronics · Simulink</span>
         <h3>Bidirectional DC–DC converter</h3>
         <p>PI controller-based charging and discharging scheme for Li-ion batteries, designed and tested in MATLAB/Simulink.</p>
       </div>
-      <div class="proj-card">
+      <div class="proj-card reveal">
         <span class="tag">IoT</span>
         <h3>Home automation system</h3>
         <p>A smart home system applying IoT concepts and communication protocols to control and monitor a household remotely.</p>
@@ -432,32 +578,32 @@
 
 <section id="leadership">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <h2>Leadership &amp; extracurricular</h2>
       <span class="section-num">05</span>
     </div>
     <div class="timeline">
-      <div class="t-item">
+      <div class="t-item reveal">
         <h3>Central Sports Captain, MIST</h3>
         <span class="t-meta">Jun 2025 – Jun 2026</span>
         <p>Led sporting activities across every department — team selection, practice scheduling, and the institute's major inter-department tournaments.</p>
       </div>
-      <div class="t-item">
+      <div class="t-item reveal">
         <h3>Sports Captain, Dept. of EECE</h3>
         <span class="t-meta">Jun 2025 – Jun 2026</span>
         <p>Ran the department's sports program: player selection, coordination, and preparation for inter-department competitions.</p>
       </div>
-      <div class="t-item">
+      <div class="t-item reveal">
         <h3>General Secretary, MIST Literature and Cultural Club</h3>
         <span class="t-meta">Jun 2025 – Jun 2026</span>
         <p>Planned and ran literary and cultural programs — club operations, membership, event coordination, and logistics.</p>
       </div>
-      <div class="t-item">
+      <div class="t-item reveal">
         <h3>Organizing Member, MIST Robotics Club</h3>
         <span class="t-meta">Jun 2025 – Jun 2026</span>
         <p>Supported club workshops and technical events, handling on-ground coordination and participant management.</p>
       </div>
-      <div class="t-item">
+      <div class="t-item reveal">
         <h3>Volunteer, 6th ICEEICT International Conference</h3>
         <span class="t-meta">2 – 4 May 2024</span>
         <p>Assisted with registration, session coordination, and participant support across the three-day conference.</p>
@@ -468,33 +614,33 @@
 
 <section id="skills">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <h2>Skills</h2>
       <span class="section-num">06</span>
     </div>
     <div class="skills-grid">
-      <div class="skill-group">
+      <div class="skill-group reveal">
         <h3>ENGINEERING SOFTWARE</h3>
         <ul>
-          <li>MATLAB &amp; Simulink</li>
-          <li>System Advisor Model (SAM)</li>
-          <li>AutoCAD</li>
+          <li><div class="skill-row">MATLAB &amp; Simulink</div><div class="skill-bar"><span data-w="88%"></span></div></li>
+          <li><div class="skill-row">System Advisor Model (SAM)</div><div class="skill-bar"><span data-w="82%"></span></div></li>
+          <li><div class="skill-row">AutoCAD</div><div class="skill-bar"><span data-w="68%"></span></div></li>
         </ul>
       </div>
-      <div class="skill-group">
+      <div class="skill-group reveal">
         <h3>OFFICE &amp; DOCUMENTATION</h3>
         <ul>
-          <li>Microsoft Excel</li>
-          <li>Microsoft PowerPoint</li>
-          <li>Microsoft Word</li>
+          <li><div class="skill-row">Microsoft Excel</div><div class="skill-bar"><span data-w="85%"></span></div></li>
+          <li><div class="skill-row">Microsoft PowerPoint</div><div class="skill-bar"><span data-w="90%"></span></div></li>
+          <li><div class="skill-row">Microsoft Word</div><div class="skill-bar"><span data-w="90%"></span></div></li>
         </ul>
       </div>
-      <div class="skill-group">
+      <div class="skill-group reveal">
         <h3>PROFESSIONAL</h3>
         <ul>
-          <li>Leadership &amp; team coordination</li>
-          <li>Event management</li>
-          <li>Communication &amp; organizing</li>
+          <li><div class="skill-row">Leadership &amp; team coordination</div><div class="skill-bar"><span data-w="92%"></span></div></li>
+          <li><div class="skill-row">Event management</div><div class="skill-bar"><span data-w="88%"></span></div></li>
+          <li><div class="skill-row">Communication &amp; organizing</div><div class="skill-bar"><span data-w="90%"></span></div></li>
         </ul>
       </div>
     </div>
@@ -517,5 +663,83 @@
   <div class="wrap fine">© 2026 Md. Rakibul Hasan.</div>
 </footer>
 
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* voltage meter — scroll progress */
+  var voltFill = document.getElementById('voltFill');
+  function updateVolt(){
+    var h = document.documentElement;
+    var scrolled = h.scrollTop;
+    var max = h.scrollHeight - h.clientHeight;
+    var pct = max > 0 ? (scrolled / max) * 100 : 0;
+    voltFill.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', updateVolt, { passive:true });
+  updateVolt();
+
+  /* busbar rail — click to scroll + active state */
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.busbar-node'));
+  var targets = nodes.map(function(n){
+    var id = n.getAttribute('data-target');
+    return id === 'top' ? document.body : document.getElementById(id);
+  });
+
+  nodes.forEach(function(n){
+    n.addEventListener('click', function(){
+      var id = n.getAttribute('data-target');
+      var el = id === 'top' ? document.body : document.getElementById(id);
+      if(el) window.scrollTo({ top: id === 'top' ? 0 : el.offsetTop - 90, behavior: reduced ? 'auto' : 'smooth' });
+    });
+  });
+
+  var sectionEls = document.querySelectorAll('section[id], header.hero');
+  var railObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        var id = entry.target.id || 'top';
+        nodes.forEach(function(n){
+          n.classList.toggle('active', n.getAttribute('data-target') === id);
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+  sectionEls.forEach(function(el){ railObserver.observe(el); });
+
+  function fillBars(container){
+    var spans = container.querySelectorAll('[data-w]');
+    spans.forEach(function(s){
+      s.style.width = reduced ? s.getAttribute('data-w') : s.getAttribute('data-w');
+    });
+  }
+
+  if(reduced){
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('is-visible'); });
+    document.querySelectorAll('[data-w]').forEach(function(s){ s.style.width = s.getAttribute('data-w'); });
+    return;
+  }
+
+  var revealObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry, i){
+      if(entry.isIntersecting){
+        var el = entry.target;
+        setTimeout(function(){
+          el.classList.add('is-visible');
+          var bars = el.querySelectorAll('[data-w]');
+          bars.forEach(function(s, j){
+            setTimeout(function(){ s.style.width = s.getAttribute('data-w'); }, j * 110);
+          });
+        }, (i % 5) * 90);
+        revealObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(function(el){
+    revealObserver.observe(el);
+  });
+})();
+</script>
 </body>
 </html>
